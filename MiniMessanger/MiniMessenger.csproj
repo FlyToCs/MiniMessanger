@@ -11,8 +11,6 @@
     <Folder Include="Application\Application Exceptions\" />
     <Folder Include="Application\Services\" />
     <Folder Include="Domain\Interfaces\Service Contracts\" />
-    <Folder Include="Domain\Interfaces\Repository contracts\" />
-    <Folder Include="Infrastructure\" />
   </ItemGroup>
 
   <ItemGroup>
