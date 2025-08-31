@@ -4,24 +4,18 @@ using Newtonsoft.Json;
 
 namespace MiniMessenger.Infrastructure;
 
-public class FileRepository : IRepository
+public class FileRepository(string path) : IRepository
 {
-    private readonly string _path;
-
-    public FileRepository(string path)
-    {
-        _path = path;
-    }
     private List<User> LoadUsersFromFile()
     {
-        string json = File.ReadAllText(_path);
+        string json = File.ReadAllText(path);
         return JsonConvert.DeserializeObject<List<User>>(json)!;
     }
 
     private void SaveUsersToFile(List<User> users)
     {
         var json = JsonConvert.SerializeObject(users);
-        File.WriteAllText(_path, json);
+        File.WriteAllText(path, json);
     }
 
     public User GetUserByUserName(string username)
@@ -57,9 +51,13 @@ public class FileRepository : IRepository
         {
             if (myUser.UserName == userName)
             {
-                myUser.ChangeFirstName(user.FirstName);
-                myUser.ChangeLastName(user.LastName);
-                myUser.ChangeEmail(user.Email);
+                if (user.FirstName != null)
+                    myUser.ChangeFirstName(user.FirstName);
+                if (user.LastName != null)
+                    myUser.ChangeLastName(user.LastName);
+                if (user.Email != null)
+                    myUser.ChangeEmail(user.Email);
+
                 updated = true;
                 break; 
             }
@@ -75,7 +73,7 @@ public class FileRepository : IRepository
     public void DeleteUser(string username)
     {
         var users = LoadUsersFromFile();
-        User userToRemove = null;
+        User? userToRemove = null;
 
         foreach (var user in users)
         {
