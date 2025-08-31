@@ -44,29 +44,35 @@ public class FileRepository(string path) : IRepository
     }
 
 
-    public void UpdateUser(string userName, User user)
+    public void UpdateUser(User user)
     {
         var users = LoadUsersFromFile();
+        foreach (var oldUser in users)
+        {
+            if (oldUser.UserName == user.UserName)
+                users.Remove(oldUser);
+        }
+        users.Add(user);
         bool updated = false;
 
-        foreach (var myUser in users)
-        {
-            if (myUser.UserName == userName)
-            {
-                if (user.FirstName != null)
-                    myUser.ChangeFirstName(user.FirstName);
-                if (user.LastName != null)
-                    myUser.ChangeLastName(user.LastName);
-                if (user.Email != null)
-                    myUser.ChangeEmail(user.Email);
-
-                updated = true;
-                break; 
-            }
-        }
-
-        if (!updated)
-            throw new InvalidOperationException("No user found with this username.");
+        // foreach (var myUser in users)
+        // {
+        //     if (myUser.UserName == userName)
+        //     {
+        //         if (user.FirstName != null)
+        //             myUser.ChangeFirstName(user.FirstName);
+        //         if (user.LastName != null)
+        //             myUser.ChangeLastName(user.LastName);
+        //         if (user.Email != null)
+        //             myUser.ChangeEmail(user.Email);
+        //
+        //         updated = true;
+        //         break; 
+        //     }
+        // }
+        //
+        // if (!updated)
+        //     throw new InvalidOperationException("No user found with this username.");
 
         SaveUsersToFile(users);
     }

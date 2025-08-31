@@ -11,6 +11,7 @@ public class UserService(FileRepository repo, Session session) : IUserService
 
     public void Register(string userName, string password)
     {
+
         List<User> userList = _repo.GetAllUser() ?? new List<User>();
         foreach (var user in userList)
         {
@@ -24,13 +25,21 @@ public class UserService(FileRepository repo, Session session) : IUserService
 
     public User Login(string userName, string password)
     {
-        
-        throw new NotImplementedException();
+        var user = _repo.GetUserByUserName(userName);
+        if (user == null)
+            throw new Exception("the username is not registered");
+
+        if (!user.VerifyPassword(password))
+            throw new Exception("The username or password in incorrect");
+
+        return user;
     }
 
-    public void ChangePassword(string oldPassword, string newPassword)
+    public void ChangePassword(string userName, string oldPassword, string newPassword)
     {
-        throw new NotImplementedException();
+        var user = _repo.GetUserByUserName(userName);
+        user.ChangePassword(oldPassword, newPassword);
+        _repo.UpdateUser(user);
     }
 
     public void ChangeStatus(string status)

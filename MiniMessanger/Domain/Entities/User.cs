@@ -11,6 +11,7 @@ public class User : BaseEntity
     public string? LastName { get; private set; }
     public string? Email { get; private set; }
     public string? UserName { get; private set; }
+    [JsonProperty]
     private string? Password { get; set; }
     public UserStatusEnum UserStatus { get; set; } = UserStatusEnum.Active;
     public UserRoleEnum UserRole { get; private set; } = UserRoleEnum.User;
@@ -27,8 +28,8 @@ public class User : BaseEntity
     }
 
     [JsonConstructor]
-
-    public User(string userName, string password) : this("empty", "empty", "test@gmail.com", userName,  password)
+    public User(string userName, string password) : 
+        this("empty", "empty", "test@gmail.com", userName,  password)
     {
         
     }
@@ -53,6 +54,11 @@ public class User : BaseEntity
             throw new PasswordValidationException("Password must be at least 6 characters long.");
 
         Password = password;
+    }
+
+    public bool VerifyPassword(string password)
+    {
+        return Password == password;
     }
 
 

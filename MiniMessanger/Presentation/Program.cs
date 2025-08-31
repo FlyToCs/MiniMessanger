@@ -11,6 +11,7 @@ using Spectre.Console;
 IUserService userService =
     new UserService(new FileRepository(@"D:\Database.txt"),
         new Session());
+Session session = new Session();
 
 
 bool flag = true;
@@ -18,46 +19,59 @@ bool flag = true;
 while (flag)
 {
     Console.Clear();
-    Console.WriteLine(FiggleFonts.Standard.Render("Mini Messenger CLI"));
+    Console.WriteLine(FiggleFonts.Standard.Render("Mini - Messenger CLI"));
     Console.Write("Enter a command: ");
     var input = ParseCommand(Console.ReadLine()!);
 
-    switch (input.Instruction)
+    try
     {
-        case "Register":
-            userService.Register(
-                input.Parameters["username"],
-                input.Parameters["password"]
-            );
-            Console.WriteLine("you registered successfully");
-            break;
+        switch (input.Instruction)
+        {
+            case "Register":
+                userService.Register(
+                    input.Parameters["username"],
+                    input.Parameters["password"]
+                );
+                Console.WriteLine("you registered successfully");
+                Console.ReadKey();
+                break;
 
-        case "Login":
-            break;
+            case "Login":
+                userService.Login(input.Parameters["username"], input.Parameters["password"]);
+                Console.WriteLine("you were login successfully");
+                Console.ReadKey();
+                break;
 
-        case "ChangeStatus":
-            break;
+            case "ChangeStatus":
+                break;
 
-        case "ChangePassword":
-            break;
+            case "ChangePassword":
+                break;
 
-        case "SearchUserName":
-            break;
+            case "SearchUserName":
+                break;
 
-        case "SendMessage":
-            break;
+            case "SendMessage":
+                break;
 
-        case "Inbox":
-            break;
+            case "Inbox":
+                break;
 
-        case "SendBox":
-            break;
+            case "SendBox":
+                break;
 
-        case "Logout":
-            flag = false;
-            break;
+            case "Logout":
+                flag = false;
+                break;
 
+        }
     }
+    catch (Exception e)
+    {
+        Console.WriteLine(e.Message);
+        Console.ReadKey();
+    }
+
 }
 
 
