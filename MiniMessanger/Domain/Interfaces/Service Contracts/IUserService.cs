@@ -1,6 +1,9 @@
-﻿namespace MiniMessenger.Domain.Interfaces.Service_Contracts;
+﻿
+namespace MiniMessenger.Domain.Interfaces.Service_Contracts;
 
 public interface IUserService
 {
-    
+
+
+
 }

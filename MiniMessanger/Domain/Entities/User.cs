@@ -24,6 +24,11 @@ public class User : BaseEntity
         SetPassword(password);
     }
 
+    public User(string userName, string password) : this("empty", "empty", "empty", userName,  password)
+    {
+        
+    }
+
 
     public void ChangePassword(string oldPassword, string newPassword)
     {
