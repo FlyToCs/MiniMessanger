@@ -11,11 +11,20 @@ public class UserService(FileRepository repo, Session session) : IUserService
 
     public void Register(string userName, string password)
     {
-        throw new NotImplementedException();
+        List<User> userList = _repo.GetAllUser() ?? new List<User>();
+        foreach (var user in userList)
+        {
+            if (user.UserName == userName)
+            {
+                throw new Exception("this username is already taken");
+            }
+        }
+        _repo.AddUser(userName, password);
     }
 
     public User Login(string userName, string password)
     {
+        
         throw new NotImplementedException();
     }
 

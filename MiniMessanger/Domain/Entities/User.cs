@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using MiniMessenger.Domain.Domain_Exceptions;
 using MiniMessenger.Domain.Enums;
+using Newtonsoft.Json;
 
 namespace MiniMessenger.Domain.Entities;
 
@@ -17,17 +18,22 @@ public class User : BaseEntity
 
     public User(string firstName, string lastName, string email, string userName, string password)
     {
-        ChangeFirstName(firstName);
-        ChangeLastName(lastName);
-        ChangeEmail(email);
-        ChangeUserName(userName);
-        SetPassword(password);
+        FirstName = firstName;
+        LastName = lastName;
+        Email = email;
+        UserName = userName;
+        Password = password;
+
     }
 
-    public User(string userName, string password) : this("empty", "empty", "empty", userName,  password)
+    [JsonConstructor]
+
+    public User(string userName, string password) : this("empty", "empty", "test@gmail.com", userName,  password)
     {
         
     }
+
+
 
 
     public void ChangePassword(string oldPassword, string newPassword)

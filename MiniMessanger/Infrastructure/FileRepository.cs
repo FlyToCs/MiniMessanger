@@ -31,16 +31,18 @@ public class FileRepository(string path) : IRepository
 
     public List<User> GetAllUser()
     {
-        return LoadUsersFromFile();
+        var userList =  LoadUsersFromFile();
+        return userList;
     }
 
     public void AddUser(string username, string password)
     {
+        var newList = LoadUsersFromFile() ?? new List<User>();
 
-        var newList = LoadUsersFromFile();
         newList.Add(new User(username, password));
         SaveUsersToFile(newList);
     }
+
 
     public void UpdateUser(string userName, User user)
     {
