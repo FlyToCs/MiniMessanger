@@ -29,6 +29,27 @@ public class FileRepository(string path) : IRepository
         throw new InvalidOperationException("No any users found with this username");
     }
 
+    public User GetUserById(int id)
+    {
+        foreach (var user in LoadUsersFromFile())
+        {
+            if (user.Id == id)
+                return user;
+        }
+        throw new InvalidOperationException("No any users found with this username");
+    }
+
+    public List<User> GetUsersStartWith(string username)
+    {
+        List<User> filterUser = new();
+        foreach (var user in LoadUsersFromFile())
+        {
+            if (user.UserName.StartsWith(username))
+                filterUser.Add(user);
+        }
+        return filterUser;
+    }
+
     public List<User> GetAllUser()
     {
         var userList =  LoadUsersFromFile();
@@ -51,28 +72,9 @@ public class FileRepository(string path) : IRepository
         {
             if (oldUser.UserName == user.UserName)
                 users.Remove(oldUser);
+            break;
         }
         users.Add(user);
-        bool updated = false;
-
-        // foreach (var myUser in users)
-        // {
-        //     if (myUser.UserName == userName)
-        //     {
-        //         if (user.FirstName != null)
-        //             myUser.ChangeFirstName(user.FirstName);
-        //         if (user.LastName != null)
-        //             myUser.ChangeLastName(user.LastName);
-        //         if (user.Email != null)
-        //             myUser.ChangeEmail(user.Email);
-        //
-        //         updated = true;
-        //         break; 
-        //     }
-        // }
-        //
-        // if (!updated)
-        //     throw new InvalidOperationException("No user found with this username.");
 
         SaveUsersToFile(users);
     }

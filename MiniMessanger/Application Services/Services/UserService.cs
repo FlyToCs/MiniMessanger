@@ -1,6 +1,8 @@
 ﻿using MiniMessenger.Domain.Entities;
+using MiniMessenger.Domain.Enums;
 using MiniMessenger.Domain.Interfaces.Service_Contracts;
 using MiniMessenger.Infrastructure;
+using Spectre.Console;
 
 namespace MiniMessenger.Application_Services.Services;
 
@@ -42,14 +44,16 @@ public class UserService(FileRepository repo, Session session) : IUserService
         _repo.UpdateUser(user);
     }
 
-    public void ChangeStatus(string status)
+    public void ChangeStatus(int id, UserStatusEnum status)
     {
-        throw new NotImplementedException();
+        var user = _repo.GetUserById(id);
+        user.UserStatus = status;
+        _repo.UpdateUser(user);
     }
 
     public List<User> Search(string userName)
     {
-        throw new NotImplementedException();
+        return _repo.GetUsersStartWith(userName);
     }
 
     public bool SendMessage(string toUsername, string message)

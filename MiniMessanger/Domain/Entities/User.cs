@@ -124,11 +124,11 @@ public class User : BaseEntity
         if (userName.Length < 3)
             throw new InvalidUserNameException("Username must be at least 3 characters long.");
 
-        // نباید با عدد شروع بشه
+       
         if (char.IsDigit(userName[0]))
             throw new InvalidUserNameException("Username cannot start with a digit.");
 
-        // فقط حروف، عدد و "_" مجازن
+        
         for (int i = 0; i < userName.Length; i++)
         {
             char c = userName[i];

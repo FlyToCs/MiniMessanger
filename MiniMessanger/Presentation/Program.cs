@@ -3,6 +3,7 @@
 using Figgle.Fonts;
 using MiniMessenger.Application_Services.Services;
 using MiniMessenger.Domain.Entities;
+using MiniMessenger.Domain.Enums;
 using MiniMessenger.Domain.Interfaces.Service_Contracts;
 using MiniMessenger.Infrastructure;
 using Spectre.Console;
@@ -37,15 +38,32 @@ while (flag)
                 break;
 
             case "Login":
-                userService.Login(input.Parameters["username"], input.Parameters["password"]);
+                var user = userService.Login(input.Parameters["username"], input.Parameters["password"]);
                 Console.WriteLine("you were login successfully");
+                session.Login(user);
                 Console.ReadKey();
                 break;
 
             case "ChangeStatus":
+
+                if (session.IsLogin)
+                {
+                    userService.ChangeStatus(session.CurrentUser.Id, (UserStatusEnum)Convert.ToInt32(input.Parameters["status"]));
+                }
+
+                Console.ReadKey();
                 break;
 
             case "ChangePassword":
+                if (session.IsLogin)
+                {
+                    Console.Write("Enter Old Password: ");
+                    string oldPassword = Console.ReadLine()!;
+                    Console.Write("Enter new Password: ");
+                    string newPassword = Console.ReadLine()!;
+                    userService.ChangePassword(session.CurrentUser.UserName,oldPassword, newPassword );
+                }
+                Console.ReadKey();
                 break;
 
             case "SearchUserName":
