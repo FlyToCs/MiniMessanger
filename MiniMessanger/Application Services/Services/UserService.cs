@@ -73,6 +73,7 @@ public class UserService(FileRepository repo, Session session) : IUserService
 
     public bool Logout()
     {
+        
         throw new NotImplementedException();
     }
 }

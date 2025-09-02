@@ -6,6 +6,7 @@ using MiniMessenger.Domain.Entities;
 using MiniMessenger.Domain.Enums;
 using MiniMessenger.Domain.Interfaces.Service_Contracts;
 using MiniMessenger.Infrastructure;
+using Restaurant_Management_System.Presentation;
 using Spectre.Console;
 
 
@@ -66,8 +67,15 @@ while (flag)
                 Console.ReadKey();
                 break;
 
-            case "SearchUserName":
+            case "Search":
+                if (session.IsLogin)
+                {
+                    ConsolePainter.WriteTable(userService.Search(input.Parameters["username"]), ConsoleColor.Yellow, ConsoleColor.Cyan);
+                }
+                
+                Console.ReadKey();
                 break;
+
 
             case "SendMessage":
                 break;
@@ -79,6 +87,7 @@ while (flag)
                 break;
 
             case "Logout":
+                session.Logout();
                 flag = false;
                 break;
 
