@@ -10,9 +10,8 @@ using Restaurant_Management_System.Presentation;
 using Spectre.Console;
 
 
-IUserService userService =
-    new UserService(new FileRepository(@"D:\Database.txt"),
-        new Session());
+IUserService userService = new UserService();
+IMessageService messageService = new MessageService();
 Session session = new Session();
 
 
@@ -78,12 +77,27 @@ while (flag)
 
 
             case "SendMessage":
+                var sentTo = userService.GetUserByName(input.Parameters["username"]);
+                messageService.SendMessage(session.CurrentUser.Id, sentTo.Id, input.Parameters["message"]);
                 break;
 
             case "Inbox":
+                if (session.IsLogin)
+                {
+                    ConsolePainter.WriteTable(messageService.ShowInBox(session.CurrentUser.Id));
+                }
+                Console.ReadKey();
                 break;
 
             case "SendBox":
+                if (session.IsLogin)
+                {
+                    ConsolePainter.WriteTable(messageService.ShowSendBox(session.CurrentUser.Id));
+                }
+                
+                break;
+
+            case "Log":
                 break;
 
             case "Logout":

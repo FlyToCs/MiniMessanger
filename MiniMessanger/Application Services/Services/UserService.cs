@@ -1,20 +1,21 @@
 ﻿using MiniMessenger.Domain.Entities;
 using MiniMessenger.Domain.Enums;
+using MiniMessenger.Domain.Interfaces.Repository_contracts;
 using MiniMessenger.Domain.Interfaces.Service_Contracts;
 using MiniMessenger.Infrastructure;
 using Spectre.Console;
 
 namespace MiniMessenger.Application_Services.Services;
 
-public class UserService(FileRepository repo, Session session) : IUserService
+public class UserService() : IUserService
 {
-    private readonly FileRepository _repo = repo;
-    private readonly Session _session = session;
+    private readonly IUserRepository _userRepository = new FileUserRepository(@"D:\Database.txt");
+
 
     public void Register(string userName, string password)
     {
 
-        List<User> userList = _repo.GetAllUser() ?? new List<User>();
+        List<User> userList = _userRepository.GetAllUser() ?? new List<User>();
         foreach (var user in userList)
         {
             if (user.UserName == userName)
@@ -22,12 +23,12 @@ public class UserService(FileRepository repo, Session session) : IUserService
                 throw new Exception("this username is already taken");
             }
         }
-        _repo.AddUser(userName, password);
+        _userRepository.AddUser(userName, password);
     }
 
     public User Login(string userName, string password)
     {
-        var user = _repo.GetUserByUserName(userName);
+        var user = _userRepository.GetUserByUserName(userName);
         if (user == null)
             throw new Exception("the username is not registered");
 
@@ -39,41 +40,30 @@ public class UserService(FileRepository repo, Session session) : IUserService
 
     public void ChangePassword(string userName, string oldPassword, string newPassword)
     {
-        var user = _repo.GetUserByUserName(userName);
+        var user = _userRepository.GetUserByUserName(userName);
         user.ChangePassword(oldPassword, newPassword);
-        _repo.UpdateUser(user);
+        _userRepository.UpdateUser(user);
     }
 
     public void ChangeStatus(int id, UserStatusEnum status)
     {
-        var user = _repo.GetUserById(id);
+        var user = _userRepository.GetUserById(id);
         user.UserStatus = status;
-        _repo.UpdateUser(user);
+        _userRepository.UpdateUser(user);
     }
 
     public List<User> Search(string userName)
     {
-        return _repo.GetUsersStartWith(userName);
+        return _userRepository.GetUsersStartWith(userName);
     }
 
-    public bool SendMessage(string toUsername, string message)
+    public User GetUserById(int userId)
     {
-        throw new NotImplementedException();
+        return _userRepository.GetUserById(userId);
     }
 
-    public List<Message> ShowInbox()
+    public User GetUserByName(string userName)
     {
-        throw new NotImplementedException();
-    }
-
-    public List<Message> ShowSendBox()
-    {
-        throw new NotImplementedException();
-    }
-
-    public bool Logout()
-    {
-        
-        throw new NotImplementedException();
+        return _userRepository.GetUserByUserName(userName);
     }
 }

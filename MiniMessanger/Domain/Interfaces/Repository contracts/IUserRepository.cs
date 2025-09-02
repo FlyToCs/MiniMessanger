@@ -2,7 +2,7 @@
 
 namespace MiniMessenger.Domain.Interfaces.Repository_contracts;
 
-public interface IRepository
+public interface IUserRepository
 {
     public User GetUserByUserName(string username);
     public User GetUserById(int id);

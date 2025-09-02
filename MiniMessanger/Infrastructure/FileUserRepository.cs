@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace MiniMessenger.Infrastructure;
 
-public class FileRepository(string path) : IRepository
+public class FileUserRepository(string path) : IUserRepository
 {
     private List<User> LoadUsersFromFile()
     {
