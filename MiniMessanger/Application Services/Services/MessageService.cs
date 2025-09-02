@@ -8,7 +8,7 @@ namespace MiniMessenger.Application_Services.Services;
 public class MessageService : IMessageService
 {
 
-    private readonly IMessageRepository _messageRepository = new FileMessageRepository(@"D:\Database.txt");
+    private readonly IMessageRepository _messageRepository = new FileMessageRepository(@"D:\Messages.txt");
     private IUserService _userService = new UserService();
     public void SendMessage(int senderId, int receiverId, string message)
     {

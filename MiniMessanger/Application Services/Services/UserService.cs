@@ -66,4 +66,18 @@ public class UserService() : IUserService
     {
         return _userRepository.GetUserByUserName(userName);
     }
+
+    public int GenerateId()
+    {
+        int max = 0;
+        foreach (var user in _userRepository.GetAllUser())
+        {
+            if (user.Id> max)
+            {
+                max = user.Id;
+            }
+        }
+
+        return max + 1;
+    }
 }

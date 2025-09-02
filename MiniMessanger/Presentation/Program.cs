@@ -8,6 +8,7 @@ using MiniMessenger.Domain.Interfaces.Service_Contracts;
 using MiniMessenger.Infrastructure;
 using Restaurant_Management_System.Presentation;
 using Spectre.Console;
+Console.OutputEncoding = System.Text.Encoding.UTF8;
 
 
 IUserService userService = new UserService();
@@ -84,7 +85,11 @@ while (flag)
             case "Inbox":
                 if (session.IsLogin)
                 {
-                    ConsolePainter.WriteTable(messageService.ShowInBox(session.CurrentUser.Id));
+                    var inbox = messageService.ShowInBox(session.CurrentUser.Id);
+                    foreach (var message in inbox)
+                    {
+                        Console.WriteLine($"📬 [Receive from]: {message.SendFrom.UserName:-15}   [Message]: {message.TextMessage} ");
+                    }
                 }
                 Console.ReadKey();
                 break;
@@ -92,8 +97,14 @@ while (flag)
             case "SendBox":
                 if (session.IsLogin)
                 {
-                    ConsolePainter.WriteTable(messageService.ShowSendBox(session.CurrentUser.Id));
+                    var sendBox = messageService.ShowSendBox(session.CurrentUser.Id);
+                    foreach (var message in sendBox)
+                    {
+                        Console.WriteLine($"📩 [Sent to]: {message.SendTo.UserName:-15}  [Message]: {message.TextMessage}");
+                    }
                 }
+
+                Console.ReadKey();
                 
                 break;
 
@@ -102,7 +113,7 @@ while (flag)
 
             case "Logout":
                 session.Logout();
-                flag = false;
+                //flag = false;
                 break;
 
         }
