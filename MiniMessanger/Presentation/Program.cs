@@ -9,6 +9,7 @@ using MiniMessenger.Domain.Interfaces.Service_Contracts;
 using MiniMessenger.Infrastructure;
 using Restaurant_Management_System.Presentation;
 using Spectre.Console;
+using System.Security.Principal;
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 
 
@@ -49,10 +50,10 @@ while (flag)
             case "ChangeStatus":
 
                 if (session.IsLogin)
-                {
                     userService.ChangeStatus(session.CurrentUser.Id, (UserStatusEnum)Convert.ToInt32(input.Parameters["status"]));
-                    //session.CurrentUser = userService.GetUserById(session.CurrentUser.Id);
-                }
+                else
+                    ConsolePainter.RedMessage("First you need to log in to your account.");
+
                 Console.ReadKey();
                 break;
 
@@ -66,6 +67,9 @@ while (flag)
                     userService.ChangePassword(session.CurrentUser.UserName, oldPassword, newPassword);
                     //session.CurrentUser = userService.GetUserById(session.CurrentUser.Id);
                 }
+                else
+                    ConsolePainter.RedMessage("First you need to log in to your account.");
+
                 Console.ReadKey();
                 break;
 
@@ -82,14 +86,22 @@ while (flag)
                 {
                     ConsolePainter.WriteTable(userService.Search(input.Parameters["username"]), ConsoleColor.Yellow, ConsoleColor.Cyan);
                 }
+                else
+                    ConsolePainter.RedMessage("First you need to log in to your account.");
+
 
                 Console.ReadKey();
                 break;
 
 
             case "SendMessage":
-                var sentTo = userService.GetUserByName(input.Parameters["username"]);
-                messageService.SendMessage(session.CurrentUser.Id, sentTo.Id, input.Parameters["message"]);
+                if (session.IsLogin)
+                {
+                    var sentTo = userService.GetUserByName(input.Parameters["username"]);
+                    messageService.SendMessage(session.CurrentUser.Id, sentTo.Id, input.Parameters["message"]);
+                }
+                else
+                    ConsolePainter.RedMessage("First you need to log in to your account.");
                 break;
 
             case "Inbox":
@@ -101,6 +113,9 @@ while (flag)
                         Console.WriteLine($"📬 [Receive from]: {message.SendFrom.UserName:-15}   [Message]: {message.TextMessage} ");
                     }
                 }
+                else
+                    ConsolePainter.RedMessage("First you need to log in to your account.");
+
                 Console.ReadKey();
                 break;
 
@@ -113,6 +128,9 @@ while (flag)
                         Console.WriteLine($"📩 [Sent to]: {message.SendTo.UserName:-15}  [Message]: {message.TextMessage}");
                     }
                 }
+                else
+                    ConsolePainter.RedMessage("First you need to log in to your account.");
+
 
                 Console.ReadKey();
                 break;
@@ -121,9 +139,10 @@ while (flag)
                 break;
 
             case "Profile":
-                session.CurrentUser = userService.GetUserById(session.CurrentUser.Id);
+
                 if (session.IsLogin)
                 {
+                    session.CurrentUser = userService.GetUserById(session.CurrentUser.Id);
                     var fullName = $"{session.CurrentUser.FirstName} {session.CurrentUser.LastName}";
                     if (fullName == "empty empty")
                         fullName = "---";
@@ -133,10 +152,14 @@ while (flag)
                     Console.WriteLine($"⚙️ Status: {session.CurrentUser.UserStatus}");
                     Console.ReadKey();
                 }
+                else
+                    ConsolePainter.RedMessage("First you need to log in to your account.");
+                
 
                 break;
 
             case "Help":
+            case "help":
                 Console.WriteLine("\nRegister --username[username] --password[password]");
                 Console.WriteLine("Login --username[username] --password[password]");
                 Console.WriteLine("ChangePassword --username[username] --password[password]");
@@ -150,7 +173,16 @@ while (flag)
 
                 break;
             case "Logout":
-                session.Logout();
+                if (!session.IsLogin)
+                    ConsolePainter.RedMessage("You are not login. what hell are you doing?");
+                else
+                {
+                    session.Logout();
+                    ConsolePainter.GreenMessage("You are logged out of your account.");
+                }
+
+                
+
                 //flag = false;
                 break;
             default:
