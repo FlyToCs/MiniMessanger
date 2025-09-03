@@ -2,6 +2,7 @@
 
 using Figgle.Fonts;
 using MiniMessenger.Application_Services.Services;
+using MiniMessenger.Commen;
 using MiniMessenger.Domain.Entities;
 using MiniMessenger.Domain.Enums;
 using MiniMessenger.Domain.Interfaces.Service_Contracts;
@@ -34,13 +35,13 @@ while (flag)
                     input.Parameters["username"],
                     input.Parameters["password"]
                 );
-                Console.WriteLine("you registered successfully");
+                ConsolePainter.GreenMessage("you registered successfully");
                 Console.ReadKey();
                 break;
 
             case "Login":
                 var user = userService.Login(input.Parameters["username"], input.Parameters["password"]);
-                Console.WriteLine("you were login successfully");
+                ConsolePainter.GreenMessage("you were login successfully");
                 session.Login(user);
                 Console.ReadKey();
                 break;
@@ -50,8 +51,8 @@ while (flag)
                 if (session.IsLogin)
                 {
                     userService.ChangeStatus(session.CurrentUser.Id, (UserStatusEnum)Convert.ToInt32(input.Parameters["status"]));
+                    //session.CurrentUser = userService.GetUserById(session.CurrentUser.Id);
                 }
-
                 Console.ReadKey();
                 break;
 
@@ -62,9 +63,18 @@ while (flag)
                     string oldPassword = Console.ReadLine()!;
                     Console.Write("Enter new Password: ");
                     string newPassword = Console.ReadLine()!;
-                    userService.ChangePassword(session.CurrentUser.UserName,oldPassword, newPassword );
+                    userService.ChangePassword(session.CurrentUser.UserName, oldPassword, newPassword);
+                    //session.CurrentUser = userService.GetUserById(session.CurrentUser.Id);
                 }
                 Console.ReadKey();
+                break;
+
+            case "ChangeName":
+
+                if (session.IsLogin)
+                {
+                    
+                }
                 break;
 
             case "Search":
@@ -72,7 +82,7 @@ while (flag)
                 {
                     ConsolePainter.WriteTable(userService.Search(input.Parameters["username"]), ConsoleColor.Yellow, ConsoleColor.Cyan);
                 }
-                
+
                 Console.ReadKey();
                 break;
 
@@ -94,7 +104,7 @@ while (flag)
                 Console.ReadKey();
                 break;
 
-            case "SendBox":
+            case "Sendbox":
                 if (session.IsLogin)
                 {
                     var sendBox = messageService.ShowSendBox(session.CurrentUser.Id);
@@ -105,22 +115,54 @@ while (flag)
                 }
 
                 Console.ReadKey();
-                
                 break;
 
             case "Log":
                 break;
 
+            case "Profile":
+                session.CurrentUser = userService.GetUserById(session.CurrentUser.Id);
+                if (session.IsLogin)
+                {
+                    var fullName = $"{session.CurrentUser.FirstName} {session.CurrentUser.LastName}";
+                    if (fullName == "empty empty")
+                        fullName = "---";
+
+                    Console.WriteLine($"\n🔰 FirstName: {fullName}");
+                    Console.WriteLine($"🪪 UserName: {session.CurrentUser.UserName}");
+                    Console.WriteLine($"⚙️ Status: {session.CurrentUser.UserStatus}");
+                    Console.ReadKey();
+                }
+
+                break;
+
+            case "Help":
+                Console.WriteLine("\nRegister --username[username] --password[password]");
+                Console.WriteLine("Login --username[username] --password[password]");
+                Console.WriteLine("ChangePassword --username[username] --password[password]");
+                Console.WriteLine("ChangeName --firstname[firstname] --lastname[lastname]");
+                Console.WriteLine("ChangeStatus --status[available/UnAvailable]");
+                Console.WriteLine("SendMessage --username[toUsername] --message[message]");
+                Console.WriteLine("Inbox");
+                Console.WriteLine("Sandbox");
+                Console.WriteLine("Profile");
+                Console.ReadKey();
+
+                break;
             case "Logout":
                 session.Logout();
                 //flag = false;
+                break;
+            default:
+                ConsolePainter.RedMessage("Invalid Command");
+                Console.ReadKey();
                 break;
 
         }
     }
     catch (Exception e)
     {
-        Console.WriteLine(e.Message);
+        ConsolePainter.RedMessage(e.Message);
         Console.ReadKey();
     }
 
@@ -128,30 +170,77 @@ while (flag)
 
 
 
+// static Command ParseCommand(string input)
+// {
+//     var userInputParts = input.Split(' ');
+//     var command = new Command
+//     {
+//         Instruction = userInputParts[0],
+//         Parameters = new Dictionary<string, string>()
+//     };
+//
+//     for (int i = 1; i < userInputParts.Length; i++)
+//     {
+//         if (userInputParts[i].StartsWith("--"))
+//         {
+//             string key = userInputParts[i].Substring(2).ToLower();
+//             string value = "";
+//             if (i + 1 < userInputParts.Length && !userInputParts[i + 1].StartsWith("--"))
+//             {
+//                 value = userInputParts[i + 1];
+//                 i++;
+//             }
+//             command.Parameters[key] = value;
+//         }
+//     }
+//     return command;
+// }
+//
+
+
 static Command ParseCommand(string input)
 {
-    var userInputParts = input.Split(' ');
     var command = new Command
     {
-        Instruction = userInputParts[0],
         Parameters = new Dictionary<string, string>()
     };
 
-    for (int i = 1; i < userInputParts.Length; i++)
+    var parts = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+    command.Instruction = parts[0];
+
+    string? currentKey = null;
+    var currentValue = new List<string>();
+
+    for (int i = 1; i < parts.Length; i++)
     {
-        if (userInputParts[i].StartsWith("--"))
+        var part = parts[i];
+
+        if (part.StartsWith("--"))
         {
-            string key = userInputParts[i].Substring(2).ToLower();
-            string value = "";
-            if (i + 1 < userInputParts.Length && !userInputParts[i + 1].StartsWith("--"))
+
+            if (currentKey != null)
             {
-                value = userInputParts[i + 1];
-                i++;
+                command.Parameters[currentKey] = string.Join(" ", currentValue);
+                currentValue.Clear();
             }
-            command.Parameters[key] = value;
+
+            currentKey = part.Substring(2).ToLower();
+        }
+        else
+        {
+            currentValue.Add(part);
         }
     }
+
+
+    if (currentKey != null)
+    {
+        command.Parameters[currentKey] = string.Join(" ", currentValue);
+    }
+
     return command;
 }
+
+
 
 Console.ReadKey();

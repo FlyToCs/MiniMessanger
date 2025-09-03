@@ -71,8 +71,12 @@ public class FileUserRepository(string path) : IUserRepository
         foreach (var oldUser in users)
         {
             if (oldUser.UserName == user.UserName)
+            {
                 users.Remove(oldUser);
-            break;
+                break;
+            }
+
+
         }
         users.Add(user);
 
