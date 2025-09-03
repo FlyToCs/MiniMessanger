@@ -6,10 +6,8 @@ using MiniMessenger.Commen;
 using MiniMessenger.Domain.Entities;
 using MiniMessenger.Domain.Enums;
 using MiniMessenger.Domain.Interfaces.Service_Contracts;
-using MiniMessenger.Infrastructure;
 using Restaurant_Management_System.Presentation;
 using Spectre.Console;
-using System.Security.Principal;
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 
 
@@ -23,8 +21,10 @@ bool flag = true;
 while (flag)
 {
     Console.Clear();
-    Console.WriteLine(FiggleFonts.Standard.Render("Mini - Messenger CLI"));
-    Console.Write("Enter a command: ");
+    ConsolePainter.CyanMessage("=============================================================================");
+    ConsolePainter.YellowMessage(FiggleFonts.Standard.Render("Mini - Messenger"));
+    ConsolePainter.CyanMessage("=============================================================================");
+    Console.Write("\n🔶 Enter a command: ");
     var input = ParseCommand(Console.ReadLine()!);
 
     try
@@ -108,28 +108,70 @@ while (flag)
                 if (session.IsLogin)
                 {
                     var inbox = messageService.ShowInBox(session.CurrentUser.Id);
-                    foreach (var message in inbox)
+
+                    if (inbox.Any())
                     {
-                        Console.WriteLine($"📬 [Receive from]: {message.SendFrom.UserName:-15}   [Message]: {message.TextMessage} ");
+                        var inboxTable = new Table();
+                        inboxTable.Border = TableBorder.Rounded;
+
+                        inboxTable.AddColumn(new TableColumn("[bold yellow]📬 From[/]"));
+                        inboxTable.AddColumn(new TableColumn("[bold cyan]✉️ Message[/]"));
+
+                        foreach (var message in inbox)
+                        {
+                            inboxTable.AddRow(
+                                $"[green]{message.SendFrom.UserName}[/]",
+                                $"[white]{message.TextMessage}[/]"
+                            );
+                        }
+
+                        AnsiConsole.Write(inboxTable);
+                    }
+                    else
+                    {
+                        AnsiConsole.MarkupLine("[bold red]⚠️ Inbox is empty.[/]");
                     }
                 }
                 else
-                    ConsolePainter.RedMessage("First you need to log in to your account.");
+                {
+                    AnsiConsole.MarkupLine("[bold red]❌ First you need to log in to your account.[/]");
+                }
 
                 Console.ReadKey();
                 break;
 
             case "Sendbox":
+
                 if (session.IsLogin)
                 {
                     var sendBox = messageService.ShowSendBox(session.CurrentUser.Id);
-                    foreach (var message in sendBox)
+
+                    if (sendBox.Any())
                     {
-                        Console.WriteLine($"📩 [Sent to]: {message.SendTo.UserName:-15}  [Message]: {message.TextMessage}");
+                        var sendTable = new Table();
+                        sendTable.Border = TableBorder.Rounded;
+                        sendTable.AddColumn("[bold yellow]📤 Sent To[/]");
+                        sendTable.AddColumn("[bold cyan]✉️ text[/]");
+
+                        foreach (var message in sendBox)
+                        {
+                            sendTable.AddRow(
+                                $"[green]{message.SendTo.UserName}[/]",
+                                $"[white]{message.TextMessage}[/]"
+                            );
+                        }
+
+                        AnsiConsole.Write(sendTable);
+                    }
+                    else
+                    {
+                        AnsiConsole.MarkupLine("[bold red]⚠️ No messages in your SendBox.[/]");
                     }
                 }
                 else
-                    ConsolePainter.RedMessage("First you need to log in to your account.");
+                {
+                    AnsiConsole.MarkupLine("[bold red]❌ First you need to log in to your account.[/]");
+                }
 
 
                 Console.ReadKey();
@@ -139,36 +181,98 @@ while (flag)
                 break;
 
             case "Profile":
-
+                Console.WriteLine();
                 if (session.IsLogin)
                 {
                     session.CurrentUser = userService.GetUserById(session.CurrentUser.Id);
+
                     var fullName = $"{session.CurrentUser.FirstName} {session.CurrentUser.LastName}";
                     if (fullName == "empty empty")
                         fullName = "---";
 
-                    Console.WriteLine($"\n🔰 FirstName: {fullName}");
-                    Console.WriteLine($"🪪 UserName: {session.CurrentUser.UserName}");
-                    Console.WriteLine($"⚙️ Status: {session.CurrentUser.UserStatus}");
+                    var profilePanel = new Panel(
+                        $"[bold yellow]🔰 Name:[/] [white]{fullName}[/]\n" +
+                        $"[bold yellow]🪪 UserName:[/] [green]{session.CurrentUser.UserName}[/]\n" +
+                        $"[bold yellow]⚙️ Status:[/] [cyan]{session.CurrentUser.UserStatus}[/]"
+                    )
+                    {
+                        Header = new PanelHeader("[bold green]👤 User Profile[/]"),
+                        Border = BoxBorder.Rounded,
+                        BorderStyle = new Style(Color.Blue)
+                    };
+
+                    AnsiConsole.Write(profilePanel);
                     Console.ReadKey();
                 }
                 else
-                    ConsolePainter.RedMessage("First you need to log in to your account.");
-                
+                {
+                    AnsiConsole.MarkupLine("[bold red]❌ First you need to log in to your account.[/]");
+                }
+
 
                 break;
 
             case "Help":
             case "help":
-                Console.WriteLine("\nRegister --username[username] --password[password]");
-                Console.WriteLine("Login --username[username] --password[password]");
-                Console.WriteLine("ChangePassword --username[username] --password[password]");
-                Console.WriteLine("ChangeName --firstname[firstname] --lastname[lastname]");
-                Console.WriteLine("ChangeStatus --status[available/UnAvailable]");
-                Console.WriteLine("SendMessage --username[toUsername] --message[message]");
-                Console.WriteLine("Inbox");
-                Console.WriteLine("Sandbox");
-                Console.WriteLine("Profile");
+
+
+
+                AnsiConsole.MarkupLine("\n[bold green]📖 Help Menu[/] \n");
+
+                var table = new Table();
+                table.Border = TableBorder.Rounded;
+                table.AddColumn(new TableColumn("[bold yellow]Command[/]").Centered());
+                table.AddColumn(new TableColumn("[bold cyan]Description[/]"));
+
+                table.AddRow(
+                    "[bold white]Register[/]",
+                    "--username=[yellow][[username]][/] --password=[yellow][[password]][/]"
+                );
+
+                table.AddRow(
+                    "[bold white]Login[/]",
+                    "--username=[yellow][[username]][/] --password=[yellow][[password]][/]"
+                );
+
+                table.AddRow(
+                    "[bold white]ChangePassword[/]",
+                    "--username=[yellow][[username]][/] --password=[yellow][[password]][/]"
+                );
+
+                table.AddRow(
+                    "[bold white]ChangeName[/]",
+                    "--firstname=[yellow][[firstname]][/] --lastname=[yellow][[lastname]][/]"
+                );
+
+                table.AddRow(
+                    "[bold white]ChangeStatus[/]",
+                    "--status=[yellow][[available/UnAvailable]][/]"
+                );
+
+                table.AddRow(
+                    "[bold white]SendMessage[/]",
+                    "--username=[yellow][[toUsername]][/] --message=[yellow][[message]][/]"
+                );
+
+                table.AddRow(
+                    "[bold white]Inbox[/]",
+                    "[dim]Show all received messages[/]"
+                );
+
+                table.AddRow(
+                    "[bold white]Sandbox[/]",
+                    "[dim]Show all sent messages[/]"
+                );
+
+                table.AddRow(
+                    "[bold white]Profile[/]",
+                    "[dim]Show user profile information[/]"
+                );
+
+                AnsiConsole.Write(table);
+
+
+
                 Console.ReadKey();
 
                 break;
@@ -181,9 +285,8 @@ while (flag)
                     ConsolePainter.GreenMessage("You are logged out of your account.");
                 }
 
-                
-
                 //flag = false;
+                Console.ReadKey();
                 break;
             default:
                 ConsolePainter.RedMessage("Invalid Command");
