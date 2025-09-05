@@ -2,7 +2,8 @@
 
 public class Message : BaseEntity
 {
-    public User? SendFrom { get; set; }
+    
+    public required User SendFrom { get; set; }
     public User? SendTo { get; set; }
     public DateTime SendTime { get; set; }
     public string? TextMessage { get; set; }

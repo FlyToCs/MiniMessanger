@@ -2,11 +2,10 @@
 
 using Figgle.Fonts;
 using MiniMessenger.Application_Services.Services;
-using MiniMessenger.Commen;
 using MiniMessenger.Domain.Entities;
 using MiniMessenger.Domain.Enums;
 using MiniMessenger.Domain.Interfaces.Service_Contracts;
-using Restaurant_Management_System.Presentation;
+using MiniMessenger.Framework;
 using Spectre.Console;
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 
@@ -60,11 +59,7 @@ while (flag)
             case "ChangePassword":
                 if (session.IsLogin)
                 {
-                    Console.Write("Enter Old Password: ");
-                    string oldPassword = Console.ReadLine()!;
-                    Console.Write("Enter new Password: ");
-                    string newPassword = Console.ReadLine()!;
-                    userService.ChangePassword(session.CurrentUser.UserName, oldPassword, newPassword);
+                    userService.ChangePassword(session.CurrentUser.UserName, input.Parameters["oldpassword"], input.Parameters["newpassword"]);
                     //session.CurrentUser = userService.GetUserById(session.CurrentUser.Id);
                 }
                 else
@@ -77,8 +72,11 @@ while (flag)
 
                 if (session.IsLogin)
                 {
-                    
+                    userService.ChangeName(session.CurrentUser.Id, input.Parameters["firstname"], input.Parameters["lastname"]);
+                    ConsolePainter.GreenMessage("The name changed");
                 }
+
+                Console.ReadKey();
                 break;
 
             case "Search":
@@ -99,11 +97,14 @@ while (flag)
                 {
                     var sentTo = userService.GetUserByName(input.Parameters["username"]);
                     messageService.SendMessage(session.CurrentUser.Id, sentTo.Id, input.Parameters["message"]);
+                    ConsolePainter.GreenMessage("Message sent");
                 }
                 else
                     ConsolePainter.RedMessage("First you need to log in to your account.");
-                break;
 
+                Console.ReadKey();
+                break;
+                
             case "Inbox":
                 if (session.IsLogin)
                 {
@@ -209,13 +210,10 @@ while (flag)
                     AnsiConsole.MarkupLine("[bold red]❌ First you need to log in to your account.[/]");
                 }
 
-
                 break;
 
             case "Help":
             case "help":
-
-
 
                 AnsiConsole.MarkupLine("\n[bold green]📖 Help Menu[/] \n");
 
@@ -226,32 +224,32 @@ while (flag)
 
                 table.AddRow(
                     "[bold white]Register[/]",
-                    "--username=[yellow][[username]][/] --password=[yellow][[password]][/]"
+                    "--username[yellow][[username]][/] --password[yellow][[password]][/]"
                 );
 
                 table.AddRow(
                     "[bold white]Login[/]",
-                    "--username=[yellow][[username]][/] --password=[yellow][[password]][/]"
+                    "--username[yellow][[username]][/] --password[yellow][[password]][/]"
                 );
 
                 table.AddRow(
                     "[bold white]ChangePassword[/]",
-                    "--username=[yellow][[username]][/] --password=[yellow][[password]][/]"
+                    "--username[yellow][[username]][/] --password[yellow][[password]][/]"
                 );
 
                 table.AddRow(
                     "[bold white]ChangeName[/]",
-                    "--firstname=[yellow][[firstname]][/] --lastname=[yellow][[lastname]][/]"
+                    "--firstname[yellow][[firstname]][/] --lastname[yellow][[lastname]][/]"
                 );
 
                 table.AddRow(
                     "[bold white]ChangeStatus[/]",
-                    "--status=[yellow][[available/UnAvailable]][/]"
+                    "--status[yellow][[available/UnAvailable]][/]"
                 );
 
                 table.AddRow(
                     "[bold white]SendMessage[/]",
-                    "--username=[yellow][[toUsername]][/] --message=[yellow][[message]][/]"
+                    "--username[yellow][[toUsername]][/] --message[yellow][[message]][/]"
                 );
 
                 table.AddRow(
@@ -269,10 +267,17 @@ while (flag)
                     "[dim]Show user profile information[/]"
                 );
 
+                table.AddRow(
+                    "[bold white]Logout[/]",
+                    "[dim]Logout of your account[/]"
+                );
+
+                table.AddRow(
+                    "[bold white]Exit[/]",
+                    "[dim]Close the CLI window[/]"
+                );
+
                 AnsiConsole.Write(table);
-
-
-
                 Console.ReadKey();
 
                 break;
@@ -284,9 +289,10 @@ while (flag)
                     session.Logout();
                     ConsolePainter.GreenMessage("You are logged out of your account.");
                 }
-
-                //flag = false;
                 Console.ReadKey();
+                break;
+            case "Exit":
+                flag = false;
                 break;
             default:
                 ConsolePainter.RedMessage("Invalid Command");
@@ -340,7 +346,7 @@ static Command ParseCommand(string input)
         Parameters = new Dictionary<string, string>()
     };
 
-    var parts = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+    var parts = input.Split(' ');
     command.Instruction = parts[0];
 
     string? currentKey = null;

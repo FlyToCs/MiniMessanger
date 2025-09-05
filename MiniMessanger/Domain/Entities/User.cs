@@ -17,7 +17,11 @@ public class User : BaseEntity
     public UserStatusEnum UserStatus { get; set; } = UserStatusEnum.Active;
     public UserRoleEnum UserRole { get; private set; } = UserRoleEnum.User;
 
-
+    public User()
+    {
+        
+    }
+    [JsonConstructor]
     public User(string firstName, string lastName, string email, string userName, string password)
     {
         Id = ++id;
@@ -26,10 +30,9 @@ public class User : BaseEntity
         Email = email;
         UserName = userName;
         Password = password;
-
     }
 
-    [JsonConstructor]
+    //[JsonConstructor]
     public User(string userName, string password) : 
         this("empty", "empty", "test@gmail.com", userName,  password)
     {

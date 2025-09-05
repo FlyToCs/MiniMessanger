@@ -67,17 +67,11 @@ public class UserService() : IUserService
         return _userRepository.GetUserByUserName(userName);
     }
 
-    public int GenerateId()
+    public void ChangeName(int userId, string firstName, string lastName)
     {
-        int max = 0;
-        foreach (var user in _userRepository.GetAllUser())
-        {
-            if (user.Id> max)
-            {
-                max = user.Id;
-            }
-        }
-
-        return max + 1;
+        var user = _userRepository.GetUserById(userId);
+        user.ChangeFirstName(firstName);
+        user.ChangeLastName(lastName);
+        _userRepository.UpdateUser(user);
     }
 }

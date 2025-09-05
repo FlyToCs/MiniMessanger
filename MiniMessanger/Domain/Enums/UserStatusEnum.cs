@@ -2,6 +2,6 @@
 
 public enum UserStatusEnum
 {
-    Active = 1,
-    Inactive = 2,
+    Active = 0,
+    Inactive = 1,
 }

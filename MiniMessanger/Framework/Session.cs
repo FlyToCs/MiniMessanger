@@ -1,6 +1,6 @@
 ﻿using MiniMessenger.Domain.Entities;
 
-namespace MiniMessenger.Commen;
+namespace MiniMessenger.Framework;
 
 public class Session
 {

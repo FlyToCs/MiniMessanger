@@ -51,8 +51,9 @@ public class FileMessageRepository(string path) : IMessageRepository
 
     public void CreateMessage(User sender, User receiver, string text)
     {
-        var messages = LoadMessagesFromFile() ?? new List<Message>(); ;
-        messages.Add(new Message(sender, receiver, text));
+        var messages = LoadMessagesFromFile() ?? new List<Message>(); 
+
+        messages.Add(new Message(sender, receiver, text){SendFrom = sender, SendTo = receiver, TextMessage = text});
         SaveMessageToFile(messages);
     }
 }

@@ -26,6 +26,8 @@ public class FileUserRepository(string path) : IUserRepository
             if (user.UserName == username)
                 return user;
         }
+
+        //return new User();
         throw new InvalidOperationException("No any users found with this username");
     }
 
@@ -36,6 +38,8 @@ public class FileUserRepository(string path) : IUserRepository
             if (user.Id == id)
                 return user;
         }
+
+        //return new User();
         throw new InvalidOperationException("No any users found with this username");
     }
 
@@ -75,8 +79,6 @@ public class FileUserRepository(string path) : IUserRepository
                 users.Remove(oldUser);
                 break;
             }
-
-
         }
         users.Add(user);
 

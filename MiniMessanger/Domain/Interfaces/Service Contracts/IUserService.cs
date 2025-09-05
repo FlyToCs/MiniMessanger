@@ -13,5 +13,6 @@ public interface IUserService
     public List<User> Search(string userName);
     public User GetUserById(int userId);
     public User GetUserByName(string userName);
+    public void ChangeName(int userId, string firstName, string lastName);
 
 }
